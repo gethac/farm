@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { events, requests } from '../../../../packages/protocol/src';
+import { events, requests } from '@qq-classic-farm/protocol';
 
 const requiredMessageNames = [
   'farm:getMine',

@@ -76,15 +76,71 @@ export type FarmOperateAction =
   | 'help'
   | 'throwWorms';
 
-export interface FarmOperateRequest {
+export interface FarmOperateBaseRequest {
   farmId: string;
   slotId: string;
-  action: FarmOperateAction;
-  itemId?: string;
-  targetUserId?: string;
-  targetSlotId?: string;
-  quantity?: number;
 }
+
+export interface PlantCropOperateRequest extends FarmOperateBaseRequest {
+  action: 'plant';
+  itemId: string;
+}
+
+export interface WaterOperateRequest extends FarmOperateBaseRequest {
+  action: 'water';
+}
+
+export interface RemoveGrassOperateRequest extends FarmOperateBaseRequest {
+  action: 'removeGrass';
+}
+
+export interface RemoveWormsOperateRequest extends FarmOperateBaseRequest {
+  action: 'removeWorms';
+}
+
+export interface FertilizeOperateRequest extends FarmOperateBaseRequest {
+  action: 'fertilize';
+  itemId: string;
+}
+
+export interface HarvestOperateRequest extends FarmOperateBaseRequest {
+  action: 'harvest';
+}
+
+export interface ClearDeadCropOperateRequest extends FarmOperateBaseRequest {
+  action: 'clearDeadCrop';
+}
+
+export interface StealOperateRequest extends FarmOperateBaseRequest {
+  action: 'steal';
+  targetUserId: string;
+  targetSlotId: string;
+  quantity: number;
+}
+
+export interface HelpOperateRequest extends FarmOperateBaseRequest {
+  action: 'help';
+  targetUserId: string;
+  targetSlotId: string;
+}
+
+export interface ThrowWormsOperateRequest extends FarmOperateBaseRequest {
+  action: 'throwWorms';
+  targetUserId: string;
+  targetSlotId: string;
+}
+
+export type FarmOperateRequest =
+  | PlantCropOperateRequest
+  | WaterOperateRequest
+  | RemoveGrassOperateRequest
+  | RemoveWormsOperateRequest
+  | FertilizeOperateRequest
+  | HarvestOperateRequest
+  | ClearDeadCropOperateRequest
+  | StealOperateRequest
+  | HelpOperateRequest
+  | ThrowWormsOperateRequest;
 
 export interface RequestPayloadMap {
   'farm:getMine': Record<string, never>;
