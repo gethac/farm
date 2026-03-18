@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest';
+﻿import { afterEach, describe, expect, it } from 'vitest';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -54,5 +54,33 @@ describe('database migrations', () => {
 
     const tableNames = rows.map((row) => row.name);
     expect(tableNames).toEqual([...requiredTables].sort());
+  });
+
+  it('adds display name uniqueness to an upgraded users table', () => {
+    const dbDir = mkdtempSync(join(tmpdir(), 'farm-server-'));
+    dbFile = join(dbDir, 'test.sqlite');
+
+    database = createDatabaseClient(dbFile);
+    database.exec(`
+      PRAGMA foreign_keys = ON;
+      CREATE TABLE users (
+        id TEXT PRIMARY KEY,
+        display_name TEXT NOT NULL,
+        password_hash TEXT NOT NULL,
+        avatar_url TEXT,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      INSERT INTO users (id, display_name, password_hash) VALUES
+        ('user-1', 'Ada', 'hash-1');
+    `);
+
+    migrate(database);
+
+    expect(() =>
+      database.prepare(
+        `INSERT INTO users (id, display_name, password_hash) VALUES ('user-2', 'Ada', 'hash-2')`,
+      ).run(),
+    ).toThrow();
   });
 });
