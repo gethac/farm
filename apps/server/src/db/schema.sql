@@ -2,7 +2,7 @@
 
 CREATE TABLE IF NOT EXISTS users (
   id TEXT PRIMARY KEY,
-  display_name TEXT NOT NULL,
+  display_name TEXT NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
   avatar_url TEXT,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -172,4 +172,5 @@ CREATE INDEX IF NOT EXISTS idx_message_logs_conversation ON message_logs(convers
 CREATE INDEX IF NOT EXISTS idx_task_progress_user_id ON task_progress(user_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_leaderboard_entries_lookup ON leaderboard_entries(leaderboard_id, period, rank_position);
+
 

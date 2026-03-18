@@ -1,4 +1,5 @@
-﻿import { resolve } from 'node:path';
+﻿import { randomBytes } from 'node:crypto';
+import { resolve } from 'node:path';
 
 export interface ServerEnv {
   host: string;
@@ -11,7 +12,7 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): ServerEnv {
   const port = parseNumber(source.PORT, 3000);
   const host = source.HOST?.trim() || '0.0.0.0';
   const databasePath = resolve(source.DATABASE_PATH?.trim() || source.SQLITE_PATH?.trim() || 'data/server.sqlite');
-  const authSecret = source.AUTH_SECRET?.trim() || 'dev-auth-secret';
+  const authSecret = source.AUTH_SECRET?.trim() || randomBytes(32).toString('base64url');
 
   return { host, port, databasePath, authSecret };
 }

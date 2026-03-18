@@ -38,28 +38,30 @@ export function createAuthService(database: DatabaseClient, secret: string): Aut
     register(input) {
       const displayName = normalizeDisplayName(input.displayName);
       const password = normalizePassword(input.password);
-      const existingUser = findUserByDisplayName(database, displayName);
-
-      if (existingUser) {
-        throw new AuthError(409, 'Display name already exists');
-      }
-
       const user: AuthenticatedUser = {
         id: randomUUID(),
         displayName,
       };
       const passwordHash = hashPassword(password);
 
-      database.prepare(
-        `
-          INSERT INTO users (id, display_name, password_hash)
-          VALUES (@id, @displayName, @passwordHash)
-        `,
-      ).run({
-        id: user.id,
-        displayName: user.displayName,
-        passwordHash,
-      });
+      try {
+        database.prepare(
+          `
+            INSERT INTO users (id, display_name, password_hash)
+            VALUES (@id, @displayName, @passwordHash)
+          `,
+        ).run({
+          id: user.id,
+          displayName: user.displayName,
+          passwordHash,
+        });
+      } catch (error) {
+        if (isUniqueDisplayNameError(error)) {
+          throw new AuthError(409, 'Display name already exists');
+        }
+
+        throw error;
+      }
 
       return {
         token: signToken({ userId: user.id }, secret),
@@ -70,8 +72,13 @@ export function createAuthService(database: DatabaseClient, secret: string): Aut
     login(input) {
       const displayName = normalizeDisplayName(input.displayName);
       const password = normalizePassword(input.password);
-      const user = findUserByDisplayName(database, displayName);
+      const users = findUsersByDisplayName(database, displayName);
 
+      if (users.length !== 1) {
+        throw new AuthError(401, 'Invalid display name or password');
+      }
+
+      const user = users[0];
       if (!user || !verifyPassword(password, user.password_hash)) {
         throw new AuthError(401, 'Invalid display name or password');
       }
@@ -112,19 +119,16 @@ function normalizePassword(value: string): string {
   return password;
 }
 
-function findUserByDisplayName(database: DatabaseClient, displayName: string): UserRow | null {
-  const rows = database
+function findUsersByDisplayName(database: DatabaseClient, displayName: string): UserRow[] {
+  return database
     .prepare(
       `
         SELECT id, display_name, password_hash
         FROM users
         WHERE display_name = @displayName
-        LIMIT 1
       `,
     )
     .all({ displayName }) as UserRow[];
-
-  return rows[0] ?? null;
 }
 
 function findUserById(database: DatabaseClient, id: string): UserRow | null {
@@ -188,6 +192,15 @@ function verifySignedToken(token: string, secret: string): { userId: string } | 
   } catch {
     return null;
   }
+}
+
+function isUniqueDisplayNameError(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    ('code' in error && error.code === 'SQLITE_CONSTRAINT_UNIQUE' ||
+      ('message' in error && typeof error.message === 'string' && error.message.includes('users.display_name')))
+  );
 }
 
 function encodeBase64Url(value: string): string {
