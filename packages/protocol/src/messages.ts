@@ -1,3 +1,5 @@
+import type { EventMessageName } from './events';
+
 export const requestNames = [
   'farm:getMine',
   'farm:getUser',
@@ -164,7 +166,7 @@ export interface ResponsePayloadMap {
   'farm:operate': {
     farm: FarmSummary;
     slots: readonly FarmSlotSummary[];
-    affectedEventNames: readonly string[];
+    affectedEventNames: readonly EventMessageName[];
   };
   'shop:list': { items: readonly ShopItemSummary[] };
   'inventory:list': { items: readonly InventoryEntrySummary[] };
