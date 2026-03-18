@@ -1,0 +1,29 @@
+# Node
+node_modules/
+.npm/
+.pnpm-store/
+
+# Builds
+dist/
+coverage/
+.vite/
+.turbo/
+
+# Playwright
+playwright-report/
+test-results/
+blob-report/
+
+# SQLite
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+
+# Misc
+.env
+.env.*
+*.log
+*.tsbuildinfo
+Thumbs.db
+.DS_Store

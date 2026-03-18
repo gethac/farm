@@ -1,0 +1,17 @@
+{
+  "name": "qq-classic-farm-mobile",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev --workspace apps/web",
+    "dev:server": "npm run dev --workspace apps/server",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "build": "npm run build --workspaces --if-present"
+  },
+  "devDependencies": {
+  }
+}
