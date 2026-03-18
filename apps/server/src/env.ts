@@ -1,17 +1,19 @@
-import { resolve } from 'node:path';
+﻿import { resolve } from 'node:path';
 
 export interface ServerEnv {
   host: string;
   port: number;
   databasePath: string;
+  authSecret: string;
 }
 
 export function loadEnv(source: NodeJS.ProcessEnv = process.env): ServerEnv {
   const port = parseNumber(source.PORT, 3000);
   const host = source.HOST?.trim() || '0.0.0.0';
   const databasePath = resolve(source.DATABASE_PATH?.trim() || source.SQLITE_PATH?.trim() || 'data/server.sqlite');
+  const authSecret = source.AUTH_SECRET?.trim() || 'dev-auth-secret';
 
-  return { host, port, databasePath };
+  return { host, port, databasePath, authSecret };
 }
 
 function parseNumber(value: string | undefined, fallback: number): number {

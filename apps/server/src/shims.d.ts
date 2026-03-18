@@ -10,6 +10,8 @@ declare const process: {
   exitCode?: number;
 };
 
+declare const Buffer: any;
+
 declare module 'node:fs' {
   export function mkdirSync(path: string, options?: { recursive?: boolean }): void;
   export function mkdtempSync(prefix: string): string;
@@ -46,4 +48,23 @@ declare module 'fastify' {
   }
 
   export default function Fastify(options: { logger?: boolean }): FastifyLikeApp;
+}
+
+declare module 'node:crypto' {
+  export function randomBytes(size: number): { toString(encoding: string): string };
+  export function randomUUID(): string;
+  export function pbkdf2Sync(password: string, salt: string, iterations: number, keylen: number, digest: string): { toString(encoding: string): string };
+  export function createHash(algorithm: string): { update(data: string): { digest(encoding: string): string } };
+  export function createHmac(algorithm: string, key: string): { update(data: string): { digest(encoding: string): string } };
+}
+
+declare module 'node:net' {
+  export class Socket {
+    on(event: string, listener: (...args: unknown[]) => void): Socket;
+    write(data: string | Uint8Array): void;
+    end(data?: string): void;
+    destroy(): void;
+  }
+
+  export function createConnection(options: { host: string; port: number }): Socket;
 }
