@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "@qq-classic-farm/server",
   "private": true,
   "version": "0.0.0",
@@ -9,8 +9,9 @@
     "build": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@qq-classic-farm/config": "workspace:*",
-    "@qq-classic-farm/protocol": "workspace:*",
+    "@qq-classic-farm/config": "file:../../packages/config",
+    "@qq-classic-farm/protocol": "file:../../packages/protocol",
+    "better-sqlite3": "^11.0.0",
     "fastify": "^5.0.0"
   }
 }

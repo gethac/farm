@@ -1,10 +1,20 @@
-﻿import { mkdirSync } from 'node:fs';
+import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
-import { DatabaseSync } from 'node:sqlite';
+// @ts-ignore - runtime dependency is provided by the workspace package install
+import Database from 'better-sqlite3';
 
-export function createDatabaseClient(databasePath: string): DatabaseSync {
+export interface DatabaseClient {
+  close(): void;
+  exec(sql: string): void;
+  prepare(sql: string): {
+    run(bindings?: Record<string, unknown>): unknown;
+    all(bindings?: Record<string, unknown>): unknown[];
+  };
+}
+
+export function createDatabaseClient(databasePath: string): DatabaseClient {
   mkdirSync(dirname(databasePath), { recursive: true });
-  const database = new DatabaseSync(databasePath);
+  const database = new Database(databasePath);
 
   database.exec(`
     PRAGMA foreign_keys = ON;

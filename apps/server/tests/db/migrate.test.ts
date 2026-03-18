@@ -1,8 +1,8 @@
-﻿import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { DatabaseSync } from 'node:sqlite';
+import { createDatabaseClient } from '../../src/db/client';
 import { migrate } from '../../src/db/migrate';
 import { seed } from '../../src/db/seed';
 
@@ -25,7 +25,7 @@ const requiredTables = [
 
 describe('database migrations', () => {
   let dbFile = '';
-  let database: DatabaseSync | undefined;
+  let database: ReturnType<typeof createDatabaseClient> | undefined;
 
   afterEach(() => {
     database?.close();
@@ -40,7 +40,7 @@ describe('database migrations', () => {
     const dbDir = mkdtempSync(join(tmpdir(), 'farm-server-'));
     dbFile = join(dbDir, 'test.sqlite');
 
-    database = new DatabaseSync(dbFile);
+    database = createDatabaseClient(dbFile);
 
     migrate(database);
     seed(database);

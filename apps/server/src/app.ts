@@ -1,8 +1,8 @@
-﻿import type { DatabaseSync } from 'node:sqlite';
+import type { DatabaseClient } from './db/client';
 import type { ServerEnv } from './env';
 
 export interface AppContext {
-  database: DatabaseSync;
+  database: DatabaseClient;
   env: ServerEnv;
 }
 

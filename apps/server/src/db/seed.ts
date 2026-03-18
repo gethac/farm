@@ -1,7 +1,7 @@
-﻿import type { DatabaseSync } from 'node:sqlite';
+import type { DatabaseClient } from './client';
 import { leaderboardRules, taskRules } from '@qq-classic-farm/config';
 
-export function seed(database: DatabaseSync): void {
+export function seed(database: DatabaseClient): void {
   const upsertTask = database.prepare(`
     INSERT INTO tasks (
       task_id,
@@ -37,7 +37,15 @@ export function seed(database: DatabaseSync): void {
       updated_at = CURRENT_TIMESTAMP
   `);
 
-  const upsertLeaderboard = database.prepare(`
+  const deleteLeaderboard = database.prepare(`
+    DELETE FROM leaderboard_entries
+    WHERE leaderboard_id = @leaderboardId
+      AND user_id IS NULL
+      AND period_started_at IS NULL
+      AND period_ended_at IS NULL
+  `);
+
+  const insertLeaderboard = database.prepare(`
     INSERT INTO leaderboard_entries (
       id,
       leaderboard_id,
@@ -67,12 +75,6 @@ export function seed(database: DatabaseSync): void {
       CURRENT_TIMESTAMP,
       '{}'
     )
-    ON CONFLICT(leaderboard_id, user_id, period_started_at, period_ended_at) DO UPDATE SET
-      leaderboard_name = excluded.leaderboard_name,
-      metric_name = excluded.metric_name,
-      period = excluded.period,
-      descending = excluded.descending,
-      refreshed_at = CURRENT_TIMESTAMP
   `);
 
   database.exec('BEGIN IMMEDIATE');
@@ -91,7 +93,11 @@ export function seed(database: DatabaseSync): void {
     }
 
     for (const rule of leaderboardRules) {
-      upsertLeaderboard.run({
+      deleteLeaderboard.run({
+        leaderboardId: rule.leaderboardId,
+      });
+
+      insertLeaderboard.run({
         id: rule.leaderboardId,
         leaderboardId: rule.leaderboardId,
         leaderboardName: rule.name,
