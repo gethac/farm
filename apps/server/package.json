@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "tsx src/index.ts",
     "test": "vitest run",
-    "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json",
+    "postbuild": "node -e \"const { copyFileSync, mkdirSync } = require('node:fs'); mkdirSync('dist/src/db', { recursive: true }); copyFileSync('src/db/schema.sql', 'dist/src/db/schema.sql');\""
   },
   "dependencies": {
     "@qq-classic-farm/config": "file:../../packages/config",

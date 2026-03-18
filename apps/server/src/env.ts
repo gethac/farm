@@ -1,4 +1,4 @@
-﻿import { resolve } from 'node:path';
+import { resolve } from 'node:path';
 
 export interface ServerEnv {
   host: string;
@@ -9,7 +9,7 @@ export interface ServerEnv {
 export function loadEnv(source: NodeJS.ProcessEnv = process.env): ServerEnv {
   const port = parseNumber(source.PORT, 3000);
   const host = source.HOST?.trim() || '0.0.0.0';
-  const databasePath = resolve(source.DATABASE_PATH?.trim() || source.SQLITE_PATH?.trim() || 'apps/server/data/server.sqlite');
+  const databasePath = resolve(source.DATABASE_PATH?.trim() || source.SQLITE_PATH?.trim() || 'data/server.sqlite');
 
   return { host, port, databasePath };
 }
