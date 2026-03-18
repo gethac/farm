@@ -1,0 +1,16 @@
+﻿{
+  "name": "@qq-classic-farm/server",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "test": "vitest run",
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@qq-classic-farm/config": "workspace:*",
+    "@qq-classic-farm/protocol": "workspace:*",
+    "fastify": "^5.0.0"
+  }
+}
