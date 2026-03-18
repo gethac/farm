@@ -6,8 +6,8 @@
     "packages/*"
   ],
   "scripts": {
-    "dev:web": "npm run dev --workspace apps/web",
-    "dev:server": "npm run dev --workspace apps/server",
+    "dev:web": "node -e \"const fs=require('fs'); const cp=require('child_process'); if (!fs.existsSync('apps/web/package.json')) { console.log('apps/web is not created yet'); process.exit(0); } cp.execSync('npm run dev --workspace apps/web', { stdio: 'inherit' });\"",
+    "dev:server": "node -e \"const fs=require('fs'); const cp=require('child_process'); if (!fs.existsSync('apps/server/package.json')) { console.log('apps/server is not created yet'); process.exit(0); } cp.execSync('npm run dev --workspace apps/server', { stdio: 'inherit' });\"",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "build": "npm run build --workspaces --if-present"
