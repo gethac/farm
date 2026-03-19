@@ -17,7 +17,12 @@ export interface TestApp {
   close(): Promise<void>;
 }
 
-export async function createTestApp(options: { listen?: boolean; now?: () => Date } = {}): Promise<TestApp> {
+export async function createTestApp(options: {
+  listen?: boolean;
+  now?: () => Date;
+  bootstrapPlayerState?: boolean;
+  testMode?: boolean;
+} = {}): Promise<TestApp> {
   const tempDir = mkdtempSync(join(tmpdir(), 'farm-server-'));
   const databasePath = join(tempDir, 'server.sqlite');
   const database = createDatabaseClient(databasePath);
@@ -29,9 +34,16 @@ export async function createTestApp(options: { listen?: boolean; now?: () => Dat
     port: 0,
     databasePath,
     authSecret: 'test-auth-secret',
+    testMode: options.testMode ?? false,
   };
 
-  const app = (await buildApp({ database, env, now: options.now })) as TestAppInstance;
+  const app = (await buildApp({
+    database,
+    env,
+    now: options.now,
+    bootstrapPlayerState: options.bootstrapPlayerState ?? false,
+    testMode: options.testMode ?? false,
+  })) as TestAppInstance;
   let port = 0;
 
   if (options.listen) {

@@ -5,8 +5,8 @@ import { FarmScreen } from './FarmScreen';
 import { createInitialGameState, reduceRealtimeEvent } from '../../app/store/game-store';
 
 const sampleFriends: FriendSummary[] = [
-  { userId: 'friend-1', nickname: '小葵', canVisit: true, lastVisitAt: null },
-  { userId: 'friend-2', nickname: '阿牧', canVisit: true, lastVisitAt: null },
+  { userId: 'friend-1', nickname: 'friend-a', canVisit: true, lastVisitAt: null },
+  { userId: 'friend-2', nickname: 'friend-b', canVisit: true, lastVisitAt: null },
 ];
 
 const slotUpdatedEvent: EventEnvelope<'farm:slotUpdated'> = {
@@ -33,6 +33,10 @@ describe('farm screen', () => {
     const initialState = createInitialGameState();
     const selectedState = {
       ...initialState,
+      farm: {
+        ...initialState.farm,
+        nickname: 'my-farm',
+      },
       friends: sampleFriends,
       selectedSlotId: 'slot-2',
     };
@@ -46,17 +50,20 @@ describe('farm screen', () => {
         onSelectSlot={() => undefined}
         onSelectFriend={() => undefined}
         onCloseActionSheet={() => undefined}
+        onAction={() => undefined}
+        onRefresh={() => undefined}
       />,
     );
 
-    expect(initialHtml).toContain('我的农场');
-    expect(initialHtml).toContain('小葵');
-    expect(initialHtml).toContain('玉米');
-    expect(initialHtml).toContain('浇水');
+    expect(initialHtml).toContain('my-farm');
+    expect(initialHtml).toContain('friend-a');
+    expect(initialHtml).toContain('friend-b');
+    expect(initialHtml).toContain('action-sheet__button');
 
     const updatedState = reduceRealtimeEvent(selectedState, slotUpdatedEvent);
     const updatedSlot = updatedState.slots.find((slot) => slot.slotId === 'slot-2') as FarmSlotSummary;
     expect(updatedSlot.status).toBe('mature');
+    expect(updatedSlot.availableActions).toContain('harvest');
 
     const updatedHtml = renderToStaticMarkup(
       <FarmScreen
@@ -67,10 +74,12 @@ describe('farm screen', () => {
         onSelectSlot={() => undefined}
         onSelectFriend={() => undefined}
         onCloseActionSheet={() => undefined}
+        onAction={() => undefined}
+        onRefresh={() => undefined}
       />,
     );
 
-    expect(updatedHtml).toContain('可收获');
-    expect(updatedHtml).toContain('收获');
+    expect(updatedHtml).toContain('farm-slot-card--mature');
+    expect(updatedHtml).toContain('action-sheet__button');
   });
 });

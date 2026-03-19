@@ -1,4 +1,5 @@
 ﻿import { createHmac, pbkdf2Sync, randomBytes, randomUUID } from 'node:crypto';
+import { itemRules } from '@qq-classic-farm/config';
 import type { DatabaseClient } from '../../db/client';
 
 export interface AuthenticatedUser {
@@ -33,7 +34,7 @@ export interface AuthService {
   verifyToken(token: string): AuthenticatedUser | null;
 }
 
-export function createAuthService(database: DatabaseClient, secret: string): AuthService {
+export function createAuthService(database: DatabaseClient, secret: string, bootstrapPlayerState = true): AuthService {
   return {
     register(input) {
       const displayName = normalizeDisplayName(input.displayName);
@@ -44,6 +45,7 @@ export function createAuthService(database: DatabaseClient, secret: string): Aut
       };
       const passwordHash = hashPassword(password);
 
+      database.exec('BEGIN IMMEDIATE');
       try {
         database.prepare(
           `
@@ -55,7 +57,13 @@ export function createAuthService(database: DatabaseClient, secret: string): Aut
           displayName: user.displayName,
           passwordHash,
         });
+
+        if (bootstrapPlayerState) {
+          bootstrapPlayerFarm(database, user);
+        }
+        database.exec('COMMIT');
       } catch (error) {
+        database.exec('ROLLBACK');
         if (isUniqueDisplayNameError(error)) {
           throw new AuthError(409, 'Display name already exists');
         }
@@ -117,6 +125,60 @@ function normalizePassword(value: string): string {
   }
 
   return password;
+}
+
+function bootstrapPlayerFarm(database: DatabaseClient, user: AuthenticatedUser): void {
+  const farmId = randomUUID();
+
+  database.prepare(`
+    INSERT INTO farms (id, user_id, name, coins, experience)
+    VALUES (@id, @userId, @name, @coins, @experience)
+  `).run({
+    id: farmId,
+    userId: user.id,
+    name: `${user.displayName} Farm`,
+    coins: 120,
+    experience: 0,
+  });
+
+  const insertSlot = database.prepare(`
+    INSERT INTO farm_slots (id, farm_id, slot_index, crop_instance_id, locked)
+    VALUES (@id, @farmId, @slotIndex, NULL, @locked)
+  `);
+
+  for (let slotIndex = 0; slotIndex < 6; slotIndex += 1) {
+    insertSlot.run({
+      id: randomUUID(),
+      farmId,
+      slotIndex,
+      locked: slotIndex >= 5 ? 1 : 0,
+    });
+  }
+
+  const starterItems = [
+    { itemId: 'seed-corn', quantity: 6 },
+    { itemId: 'seed-rice', quantity: 6 },
+    { itemId: 'water-can', quantity: 1 },
+  ];
+
+  const validItemIds = new Set(itemRules.map((rule) => rule.itemId));
+  const insertInventory = database.prepare(`
+    INSERT INTO inventory_entries (id, user_id, item_id, quantity)
+    VALUES (@id, @userId, @itemId, @quantity)
+  `);
+
+  for (const item of starterItems) {
+    if (!validItemIds.has(item.itemId)) {
+      continue;
+    }
+
+    insertInventory.run({
+      id: randomUUID(),
+      userId: user.id,
+      itemId: item.itemId,
+      quantity: item.quantity,
+    });
+  }
 }
 
 function findUsersByDisplayName(database: DatabaseClient, displayName: string): UserRow[] {

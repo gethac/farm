@@ -1,9 +1,11 @@
 ﻿import type { InventoryEntrySummary } from '@qq-classic-farm/protocol';
 
 const inventoryLabels: Record<string, string> = {
-  wheat: '小麦',
-  'corn-seed': '玉米种子',
-  fertilizer: '化肥',
+  rice: '小麦',
+  corn: '玉米',
+  'seed-corn': '玉米种子',
+  'seed-rice': '水稻种子',
+  'water-can': '水壶',
 };
 
 export function InventorySheet(props: { items: readonly InventoryEntrySummary[] }) {

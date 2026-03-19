@@ -554,3 +554,13 @@ input {
   font-size: 12px;
   font-style: normal;
 }
+
+.panel-action,
+.list-card__action {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 2px solid rgba(98, 60, 26, 0.24);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fff8dd 0%, #ffd37d 100%);
+  color: var(--farm-text);
+}

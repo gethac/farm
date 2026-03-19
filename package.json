@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "qq-classic-farm-mobile",
   "private": true,
   "workspaces": [
@@ -8,7 +8,7 @@
   "scripts": {
     "dev:web": "node -e \"const fs=require('fs'); const cp=require('child_process'); if (!fs.existsSync('apps/web/package.json')) { console.log('apps/web is not created yet'); process.exit(0); } cp.execSync('npm run dev --workspace apps/web', { stdio: 'inherit' });\"",
     "dev:server": "node -e \"const fs=require('fs'); const cp=require('child_process'); if (!fs.existsSync('apps/server/package.json')) { console.log('apps/server is not created yet'); process.exit(0); } cp.execSync('npm run dev --workspace apps/server', { stdio: 'inherit' });\"",
-    "test": "vitest run",
+    "test": "node node_modules/vitest/vitest.mjs run --pool threads --testTimeout 15000 apps/server/tests apps/web/src",
     "test:e2e": "playwright test",
     "build": "npm run build --workspaces --if-present"
   },

@@ -15,6 +15,7 @@ const actionLabels: Record<FarmOperateAction, string> = {
 
 export function FarmActionSheet(props: {
   slot: FarmSlotSummary | null;
+  onAction(action: FarmOperateAction, slotId: string): void;
   onClose(): void;
 }) {
   if (!props.slot) {
@@ -29,7 +30,14 @@ export function FarmActionSheet(props: {
       </div>
       <div className="action-sheet__actions">
         {props.slot.availableActions.map((action) => (
-          <button key={action} type="button" className="action-sheet__button">{actionLabels[action]}</button>
+          <button
+            key={action}
+            type="button"
+            className="action-sheet__button"
+            onClick={() => props.onAction(action, props.slot!.slotId)}
+          >
+            {actionLabels[action]}
+          </button>
         ))}
       </div>
     </aside>

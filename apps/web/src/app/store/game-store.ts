@@ -72,7 +72,7 @@ export function createInitialGameState(): GameState {
     },
     {
       slotId: 'slot-3',
-      cropId: 'wheat',
+      cropId: 'rice',
       plantedAt: '2026-03-19T08:00:00.000Z',
       maturedAt: '2026-03-19T09:00:00.000Z',
       withersAt: '2026-03-19T12:00:00.000Z',
@@ -84,7 +84,7 @@ export function createInitialGameState(): GameState {
     },
     {
       slotId: 'slot-4',
-      cropId: 'carrot',
+      cropId: 'corn',
       plantedAt: '2026-03-19T05:30:00.000Z',
       maturedAt: '2026-03-19T07:30:00.000Z',
       withersAt: '2026-03-19T09:30:00.000Z',
@@ -127,15 +127,15 @@ export function createInitialGameState(): GameState {
   ];
 
   const inventoryItems: InventoryEntrySummary[] = [
-    { itemId: 'wheat', quantity: 18 },
-    { itemId: 'corn-seed', quantity: 6 },
-    { itemId: 'fertilizer', quantity: 3 },
+    { itemId: 'rice', quantity: 18 },
+    { itemId: 'seed-corn', quantity: 6 },
+    { itemId: 'water-can', quantity: 1 },
   ];
 
   const shopItems: ShopItemSummary[] = [
-    { itemId: 'corn-seed', name: '玉米种子', price: 18, category: 'seed' },
-    { itemId: 'carrot-seed', name: '胡萝卜种子', price: 15, category: 'seed' },
-    { itemId: 'fertilizer', name: '高级化肥', price: 42, category: 'consumable' },
+    { itemId: 'seed-corn', name: 'Corn Seed', price: 18, category: 'seed' },
+    { itemId: 'seed-rice', name: 'Rice Seed', price: 12, category: 'seed' },
+    { itemId: 'water-can', name: 'Water Can', price: 0, category: 'tool' },
   ];
 
   const tasks: TaskSummary[] = [
@@ -223,7 +223,7 @@ export function reduceRealtimeEvent(currentState: GameState, event: EventEnvelop
             notificationType: payload.kind,
             title: '最新提醒',
             body: payload.message,
-            createdAt: '2026-03-19T11:30:00.000Z',
+            createdAt: new Date().toISOString(),
             isRead: false,
           },
           ...currentState.notices,
@@ -254,6 +254,41 @@ export const gameActions = {
   },
   setNotificationsOpen(notificationsOpen: boolean) {
     state = { ...state, notificationsOpen };
+    emit();
+  },
+  hydrateFarm(farm: FarmSummary, slots: readonly FarmSlotSummary[]) {
+    state = {
+      ...state,
+      farm,
+      slots,
+      coins: farm.coins,
+      experience: farm.experience,
+      level: farm.level,
+    };
+    emit();
+  },
+  setShopItems(shopItems: readonly ShopItemSummary[]) {
+    state = { ...state, shopItems };
+    emit();
+  },
+  setInventoryItems(inventoryItems: readonly InventoryEntrySummary[]) {
+    state = { ...state, inventoryItems };
+    emit();
+  },
+  setFriends(friends: readonly FriendSummary[]) {
+    state = { ...state, friends };
+    emit();
+  },
+  setTasks(tasks: readonly TaskSummary[]) {
+    state = { ...state, tasks };
+    emit();
+  },
+  setRankingEntries(rankingEntries: readonly LeaderboardEntrySummary[]) {
+    state = { ...state, rankingEntries };
+    emit();
+  },
+  setNotices(notices: readonly NotificationSummary[]) {
+    state = { ...state, notices };
     emit();
   },
   applyRealtimeEvent(event: EventEnvelope) {

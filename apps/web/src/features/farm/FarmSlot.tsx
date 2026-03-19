@@ -1,9 +1,8 @@
 ﻿import type { FarmSlotSummary } from '@qq-classic-farm/protocol';
 
 const cropLabels: Record<string, string> = {
-  wheat: '小麦',
+  rice: '小麦',
   corn: '玉米',
-  carrot: '胡萝卜',
 };
 
 const statusLabels: Record<FarmSlotSummary['status'], string> = {
@@ -15,6 +14,7 @@ const statusLabels: Record<FarmSlotSummary['status'], string> = {
 
 export function FarmSlot(props: {
   slot: FarmSlotSummary;
+  slotNumber: number;
   isSelected: boolean;
   onSelect(slotId: string): void;
 }) {
@@ -26,7 +26,12 @@ export function FarmSlot(props: {
   ].filter(Boolean).join(' ');
 
   return (
-    <button type="button" className={className} onClick={() => props.onSelect(props.slot.slotId)}>
+    <button
+      type="button"
+      aria-label={`地块 ${props.slotNumber}`}
+      className={className}
+      onClick={() => props.onSelect(props.slot.slotId)}
+    >
       <strong>{props.slot.locked ? '未解锁' : cropLabel}</strong>
       <span>{props.slot.locked ? '敬请期待' : statusLabels[props.slot.status]}</span>
       <em>健康 {props.slot.health}%</em>
