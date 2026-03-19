@@ -1,16 +1,22 @@
 import type {
   ErrorEnvelope,
   FarmOperateRequest,
+  FriendRequestAcceptRequest,
+  FriendRequestCreateRequest,
+  FriendRemoveRequest,
   InventorySellRequest,
   ProtocolErrorCode,
   RequestEnvelope,
   ResponseEnvelope,
   ShopPurchaseRequest,
+  SocialVisitRequest,
 } from '@qq-classic-farm/protocol';
 import type { FarmOperationService } from '../modules/farm/farm-operation-service';
 import type { FarmQueryService } from '../modules/farm/farm-query-service';
 import type { InventoryService } from '../modules/inventory/inventory-service';
+import type { NotificationService } from '../modules/notifications/notification-service';
 import type { ShopService } from '../modules/shop/shop-service';
+import type { SocialService } from '../modules/social/social-service';
 import type { SocketSession } from './session-store';
 
 export interface RealtimeRouter {
@@ -21,7 +27,9 @@ export function createRealtimeRouter(dependencies: {
   farmQueryService: FarmQueryService;
   farmOperationService: FarmOperationService;
   inventoryService: InventoryService;
+  notificationService: NotificationService;
   shopService: ShopService;
+  socialService: SocialService;
 }): RealtimeRouter {
   return {
     handle(session, request) {
@@ -93,6 +101,54 @@ export function createRealtimeRouter(dependencies: {
               requestId: request.requestId,
               message: 'inventory:sell',
               payload: dependencies.inventoryService.sell(session.userId, payload),
+            };
+          }
+          case 'friends:list': {
+            return {
+              requestId: request.requestId,
+              message: 'friends:list',
+              payload: dependencies.socialService.listFriends(session.userId),
+            };
+          }
+          case 'friends:request': {
+            const payload = request.payload as FriendRequestCreateRequest;
+            return {
+              requestId: request.requestId,
+              message: 'friends:request',
+              payload: dependencies.socialService.sendRequest(session.userId, payload),
+            };
+          }
+          case 'friends:accept': {
+            const payload = request.payload as FriendRequestAcceptRequest;
+            return {
+              requestId: request.requestId,
+              message: 'friends:accept',
+              payload: dependencies.socialService.acceptRequest(session.userId, payload),
+            };
+          }
+          case 'friends:remove': {
+            const payload = request.payload as FriendRemoveRequest;
+            return {
+              requestId: request.requestId,
+              message: 'friends:remove',
+              payload: dependencies.socialService.removeFriend(session.userId, payload),
+            };
+          }
+          case 'social:visit': {
+            const payload = request.payload as SocialVisitRequest;
+            return {
+              requestId: request.requestId,
+              message: 'social:visit',
+              payload: dependencies.socialService.visitFriend(session.userId, payload),
+            };
+          }
+          case 'notice:list': {
+            return {
+              requestId: request.requestId,
+              message: 'notice:list',
+              payload: {
+                notices: dependencies.notificationService.list(session.userId),
+              },
             };
           }
           default:

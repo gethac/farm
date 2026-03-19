@@ -9,6 +9,11 @@ export const requestNames = [
   'inventory:list',
   'inventory:sell',
   'friends:list',
+  'friends:request',
+  'friends:accept',
+  'friends:remove',
+  'social:visit',
+  'notice:list',
   'tasks:list',
   'ranking:list',
 ] as const;
@@ -68,6 +73,25 @@ export interface FriendSummary {
   lastVisitAt?: string | null;
 }
 
+export interface FriendRequestSummary {
+  requestId: string;
+  requesterUserId: string;
+  requesterNickname: string;
+  addresseeUserId: string;
+  message: string | null;
+  status: 'pending' | 'accepted' | 'declined' | 'cancelled';
+  requestedAt: string;
+}
+
+export interface NotificationSummary {
+  noticeId: string;
+  notificationType: string;
+  title: string;
+  body: string;
+  createdAt: string;
+  isRead: boolean;
+}
+
 export interface TaskSummary {
   taskId: string;
   progress: number;
@@ -92,6 +116,27 @@ export interface ShopItemSummary {
 export interface InventoryMutationSummary {
   farm: FarmSummary;
   inventory: readonly InventoryEntrySummary[];
+  affectedEventNames: readonly EventMessageName[];
+}
+
+export interface FriendRequestMutationSummary {
+  affectedEventNames: readonly EventMessageName[];
+}
+
+export interface FriendRequestCreatedSummary extends FriendRequestMutationSummary {
+  requestId: string;
+}
+
+export interface FriendAcceptSummary extends FriendRequestMutationSummary {
+  friendshipId: string;
+}
+
+export interface FriendRemoveSummary extends FriendRequestMutationSummary {
+  removedUserId: string;
+}
+
+export interface SocialVisitSummary {
+  visitId: string;
   affectedEventNames: readonly EventMessageName[];
 }
 
@@ -171,6 +216,23 @@ export interface InventorySellRequest {
   quantity: number;
 }
 
+export interface FriendRequestCreateRequest {
+  targetUserId: string;
+  message?: string;
+}
+
+export interface FriendRequestAcceptRequest {
+  requestId: string;
+}
+
+export interface FriendRemoveRequest {
+  targetUserId: string;
+}
+
+export interface SocialVisitRequest {
+  targetUserId: string;
+}
+
 export interface RequestPayloadMap {
   'farm:getMine': Record<string, never>;
   'farm:getUser': { userId: string };
@@ -180,6 +242,11 @@ export interface RequestPayloadMap {
   'inventory:list': Record<string, never>;
   'inventory:sell': InventorySellRequest;
   'friends:list': Record<string, never>;
+  'friends:request': FriendRequestCreateRequest;
+  'friends:accept': FriendRequestAcceptRequest;
+  'friends:remove': FriendRemoveRequest;
+  'social:visit': SocialVisitRequest;
+  'notice:list': Record<string, never>;
   'tasks:list': Record<string, never>;
   'ranking:list': { rankingId?: string };
 }
@@ -201,7 +268,16 @@ export interface ResponsePayloadMap {
   'shop:purchase': InventoryMutationSummary;
   'inventory:list': { items: readonly InventoryEntrySummary[] };
   'inventory:sell': InventoryMutationSummary;
-  'friends:list': { friends: readonly FriendSummary[] };
+  'friends:list': {
+    friends: readonly FriendSummary[];
+    pendingReceived: readonly FriendRequestSummary[];
+    pendingSent: readonly FriendRequestSummary[];
+  };
+  'friends:request': FriendRequestCreatedSummary;
+  'friends:accept': FriendAcceptSummary;
+  'friends:remove': FriendRemoveSummary;
+  'social:visit': SocialVisitSummary;
+  'notice:list': { notices: readonly NotificationSummary[] };
   'tasks:list': { tasks: readonly TaskSummary[] };
   'ranking:list': { entries: readonly LeaderboardEntrySummary[] };
 }
@@ -232,6 +308,11 @@ export const requests = {
   'inventory:list': { name: 'inventory:list', kind: 'request' },
   'inventory:sell': { name: 'inventory:sell', kind: 'request' },
   'friends:list': { name: 'friends:list', kind: 'request' },
+  'friends:request': { name: 'friends:request', kind: 'request' },
+  'friends:accept': { name: 'friends:accept', kind: 'request' },
+  'friends:remove': { name: 'friends:remove', kind: 'request' },
+  'social:visit': { name: 'social:visit', kind: 'request' },
+  'notice:list': { name: 'notice:list', kind: 'request' },
   'tasks:list': { name: 'tasks:list', kind: 'request' },
   'ranking:list': { name: 'ranking:list', kind: 'request' },
 } as const satisfies Record<RequestMessageName, RequestDefinition>;

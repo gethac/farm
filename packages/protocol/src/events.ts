@@ -1,10 +1,16 @@
 import type {
   FarmSlotSummary,
   FriendSummary,
+  FriendRequestCreatedSummary,
+  FriendAcceptSummary,
+  FriendRemoveSummary,
+  FriendRequestSummary,
   InventoryEntrySummary,
   InventoryMutationSummary,
   LeaderboardEntrySummary,
+  NotificationSummary,
   ShopItemSummary,
+  SocialVisitSummary,
   TaskSummary,
 } from './messages';
 
@@ -17,6 +23,11 @@ export const eventNames = [
   'inventory:list',
   'inventory:sell',
   'friends:list',
+  'friends:request',
+  'friends:accept',
+  'friends:remove',
+  'social:visit',
+  'notice:list',
   'tasks:list',
   'ranking:list',
   'farm:slotUpdated',
@@ -37,7 +48,16 @@ export interface EventPayloadMap {
   'shop:purchase': InventoryMutationSummary;
   'inventory:list': { items: readonly InventoryEntrySummary[] };
   'inventory:sell': InventoryMutationSummary;
-  'friends:list': { friends: readonly FriendSummary[] };
+  'friends:list': {
+    friends: readonly FriendSummary[];
+    pendingReceived: readonly FriendRequestSummary[];
+    pendingSent: readonly FriendRequestSummary[];
+  };
+  'friends:request': FriendRequestCreatedSummary;
+  'friends:accept': FriendAcceptSummary;
+  'friends:remove': FriendRemoveSummary;
+  'social:visit': SocialVisitSummary;
+  'notice:list': { notices: readonly NotificationSummary[] };
   'tasks:list': { tasks: readonly TaskSummary[] };
   'ranking:list': { entries: readonly LeaderboardEntrySummary[] };
   'farm:slotUpdated': { farmId: string; slot: FarmSlotSummary };
@@ -65,6 +85,11 @@ export const events = {
   'inventory:list': { name: 'inventory:list', kind: 'event' },
   'inventory:sell': { name: 'inventory:sell', kind: 'event' },
   'friends:list': { name: 'friends:list', kind: 'event' },
+  'friends:request': { name: 'friends:request', kind: 'event' },
+  'friends:accept': { name: 'friends:accept', kind: 'event' },
+  'friends:remove': { name: 'friends:remove', kind: 'event' },
+  'social:visit': { name: 'social:visit', kind: 'event' },
+  'notice:list': { name: 'notice:list', kind: 'event' },
   'tasks:list': { name: 'tasks:list', kind: 'event' },
   'ranking:list': { name: 'ranking:list', kind: 'event' },
   'farm:slotUpdated': { name: 'farm:slotUpdated', kind: 'event' },

@@ -6,7 +6,11 @@ import { registerAuthController } from './modules/auth/auth-controller';
 import { createFarmOperationService } from './modules/farm/farm-operation-service';
 import { createFarmQueryService } from './modules/farm/farm-query-service';
 import { createInventoryService } from './modules/inventory/inventory-service';
+import { createNotificationService } from './modules/notifications/notification-service';
 import { createShopService } from './modules/shop/shop-service';
+import { createActivityLogRepository } from './modules/social/activity-log-repository';
+import { createFriendshipRepository } from './modules/social/friendship-repository';
+import { createSocialService } from './modules/social/social-service';
 import { createRealtimeRouter, type RealtimeRouter } from './realtime/router';
 import { createSessionStore, type SessionStore } from './realtime/session-store';
 import { registerSocketServer } from './realtime/socket-server';
@@ -41,7 +45,23 @@ export async function buildApp(context: AppContext): Promise<ServerApp> {
   const farmOperationService = createFarmOperationService(context.database, now);
   const inventoryService = createInventoryService(context.database, now);
   const shopService = createShopService(context.database, now);
-  const realtimeRouter = createRealtimeRouter({ farmQueryService, farmOperationService, inventoryService, shopService });
+  const notificationService = createNotificationService(context.database);
+  const friendshipRepository = createFriendshipRepository(context.database);
+  const activityLogRepository = createActivityLogRepository(context.database);
+  const socialService = createSocialService({
+    database: context.database,
+    friendshipRepository,
+    activityLogRepository,
+    notificationService,
+  });
+  const realtimeRouter = createRealtimeRouter({
+    farmQueryService,
+    farmOperationService,
+    inventoryService,
+    notificationService,
+    shopService,
+    socialService,
+  });
 
   app.sessionStore = sessionStore;
   app.realtimeRouter = realtimeRouter;
