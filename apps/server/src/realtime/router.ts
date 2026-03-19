@@ -1,4 +1,11 @@
-﻿import type { ErrorEnvelope, ProtocolErrorCode, RequestEnvelope, ResponseEnvelope } from '@qq-classic-farm/protocol';
+import type {
+  ErrorEnvelope,
+  FarmOperateRequest,
+  ProtocolErrorCode,
+  RequestEnvelope,
+  ResponseEnvelope,
+} from '@qq-classic-farm/protocol';
+import type { FarmOperationService } from '../modules/farm/farm-operation-service';
 import type { FarmQueryService } from '../modules/farm/farm-query-service';
 import type { SocketSession } from './session-store';
 
@@ -6,7 +13,10 @@ export interface RealtimeRouter {
   handle(session: SocketSession, request: RequestEnvelope): ResponseEnvelope | ErrorEnvelope;
 }
 
-export function createRealtimeRouter(dependencies: { farmQueryService: FarmQueryService }): RealtimeRouter {
+export function createRealtimeRouter(dependencies: {
+  farmQueryService: FarmQueryService;
+  farmOperationService: FarmOperationService;
+}): RealtimeRouter {
   return {
     handle(session, request) {
       try {
@@ -28,18 +38,39 @@ export function createRealtimeRouter(dependencies: { farmQueryService: FarmQuery
               payload: snapshot,
             };
           }
+          case 'farm:operate': {
+            const payload = request.payload as FarmOperateRequest;
+            const operation = dependencies.farmOperationService.execute(session.userId, payload);
+            const snapshot = operation.farmOwnerUserId === session.userId
+              ? dependencies.farmQueryService.getMine(session.userId)
+              : dependencies.farmQueryService.getUser(session.userId, operation.farmOwnerUserId);
+
+            return {
+              requestId: request.requestId,
+              message: 'farm:operate',
+              payload: {
+                farm: snapshot.farm,
+                slots: snapshot.slots,
+                affectedEventNames: operation.affectedEventNames,
+              },
+            };
+          }
           default:
             return createErrorEnvelope(request.requestId, 'BAD_REQUEST', `Unsupported realtime request: ${request.message}`);
         }
       } catch (error) {
-        return createErrorEnvelope(
-          request.requestId,
-          'NOT_FOUND',
-          error instanceof Error ? error.message : 'Realtime request failed',
-        );
+        return createErrorEnvelope(request.requestId, getErrorCode(error), error instanceof Error ? error.message : 'Realtime request failed');
       }
     },
   };
+}
+
+function getErrorCode(error: unknown): ProtocolErrorCode {
+  if (typeof error === 'object' && error !== null && 'code' in error && typeof error.code === 'string') {
+    return error.code as ProtocolErrorCode;
+  }
+
+  return 'NOT_FOUND';
 }
 
 function createErrorEnvelope(requestId: string, code: ProtocolErrorCode, message: string): ErrorEnvelope {

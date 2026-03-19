@@ -1,8 +1,9 @@
-﻿import Fastify from 'fastify';
+import Fastify from 'fastify';
 import type { DatabaseClient } from './db/client';
 import type { ServerEnv } from './env';
 import { createAuthService } from './modules/auth/auth-service';
 import { registerAuthController } from './modules/auth/auth-controller';
+import { createFarmOperationService } from './modules/farm/farm-operation-service';
 import { createFarmQueryService } from './modules/farm/farm-query-service';
 import { createRealtimeRouter, type RealtimeRouter } from './realtime/router';
 import { createSessionStore, type SessionStore } from './realtime/session-store';
@@ -30,11 +31,13 @@ export interface ServerApp {
 
 export async function buildApp(context: AppContext): Promise<ServerApp> {
   const app = Fastify({ logger: false }) as ServerApp;
+  const now = context.now ?? (() => new Date());
 
   const authService = createAuthService(context.database, context.env.authSecret);
   const sessionStore = createSessionStore();
-  const farmQueryService = createFarmQueryService(context.database, context.now ?? (() => new Date()));
-  const realtimeRouter = createRealtimeRouter({ farmQueryService });
+  const farmQueryService = createFarmQueryService(context.database, now);
+  const farmOperationService = createFarmOperationService(context.database, now);
+  const realtimeRouter = createRealtimeRouter({ farmQueryService, farmOperationService });
 
   app.sessionStore = sessionStore;
   app.realtimeRouter = realtimeRouter;
