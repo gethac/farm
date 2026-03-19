@@ -3,7 +3,10 @@ import { createAppRoutes, type AppRoute } from './router';
 import { useGameStore, gameActions, type GameState } from './store/game-store';
 import { useSessionStore, type SessionState } from './store/session-store';
 import { socketClient } from './socket/client';
+import { handleSocketEvent } from './socket/handlers';
 import { AuthGate } from '../features/auth/AuthGate';
+import { FarmTopBar } from '../features/farm/FarmTopBar';
+import { FarmScreen } from '../features/farm/FarmScreen';
 
 const routes = createAppRoutes();
 
@@ -27,7 +30,9 @@ export function App() {
 
   useEffect(() => {
     syncSocketSession(session.token, socketClient);
+    const unsubscribe = socketClient.subscribe(handleSocketEvent);
     return () => {
+      unsubscribe();
       socketClient.disconnect();
     };
   }, [session.token]);
@@ -59,58 +64,32 @@ export function AppShell(props: {
       <div className="app-bg app-bg--sky" />
       <div className="app-bg app-bg--glow" />
       <main className="mobile-frame">
-        <header className="top-bar">
-          <div className="avatar-badge" aria-hidden="true">
-            农
-          </div>
-          <div className="profile-copy">
-            <strong>{props.session.displayName ?? '游客'}</strong>
-            <span>Lv.{props.game.level} 农场新星</span>
-          </div>
-          <div className="stat-chip">
-            <span>金币</span>
-            <strong>{props.game.coins}</strong>
-          </div>
-          <div className="stat-chip">
-            <span>经验</span>
-            <strong>{props.game.experience}</strong>
-          </div>
-        </header>
+        <FarmTopBar
+          displayName={props.session.displayName ?? '游客'}
+          level={props.game.level}
+          coins={props.game.coins}
+          experience={props.game.experience}
+        />
 
-        <section className="hero-panel">
-          <div className="hero-copy">
-            <p className="hero-kicker">QQ经典农场</p>
-            <h1>我的农场</h1>
-            <p>{currentRoute.description}</p>
-          </div>
-          <div className="hero-scene" aria-hidden="true">
-            <div className="scene-sun" />
-            <div className="scene-cloud scene-cloud--left" />
-            <div className="scene-cloud scene-cloud--right" />
-            <div className="scene-hill" />
-            <div className="scene-field">
-              <span />
-              <span />
-              <span />
-              <span />
+        {props.game.activeTab === 'farm' ? (
+          <FarmScreen
+            farm={props.game.farm}
+            slots={props.game.slots}
+            selectedSlotId={props.game.selectedSlotId}
+            friends={props.game.friends}
+            onSelectSlot={(slotId) => gameActions.selectSlot(slotId)}
+            onSelectFriend={(userId) => gameActions.selectFriend(userId)}
+            onCloseActionSheet={() => gameActions.selectSlot(null)}
+          />
+        ) : (
+          <section className="content-panel" aria-label={currentRoute.label}>
+            <div className="content-header">
+              <strong>{currentRoute.label}</strong>
+              <span>{currentRoute.description}</span>
             </div>
-          </div>
-        </section>
-
-        <section className="content-panel" aria-label={currentRoute.label}>
-          <div className="content-header">
-            <strong>{currentRoute.label}</strong>
-            <span>移动端经典界面骨架已接入</span>
-          </div>
-          <div className="farm-grid" aria-hidden="true">
-            <span className="farm-grid__slot farm-grid__slot--active" />
-            <span className="farm-grid__slot" />
-            <span className="farm-grid__slot farm-grid__slot--ready" />
-            <span className="farm-grid__slot" />
-            <span className="farm-grid__slot" />
-            <span className="farm-grid__slot farm-grid__slot--locked" />
-          </div>
-        </section>
+            <div className="panel-placeholder">{currentRoute.label} 面板即将接入实时数据。</div>
+          </section>
+        )}
 
         <nav className="bottom-nav" aria-label="主导航">
           {props.routes.map((route) => (
