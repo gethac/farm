@@ -1,0 +1,25 @@
+﻿:root {
+  --farm-sky-top: #8cd0ff;
+  --farm-sky-bottom: #dff5ff;
+  --farm-sun: #ffe27a;
+  --farm-hill: #7dcf6d;
+  --farm-hill-deep: #4da453;
+  --farm-field: #9f6936;
+  --farm-field-light: #c68a4a;
+  --farm-panel: rgba(255, 252, 238, 0.94);
+  --farm-panel-strong: #fff6d5;
+  --farm-border: #7a552e;
+  --farm-shadow: rgba(73, 46, 18, 0.24);
+  --farm-accent: #ff8b3d;
+  --farm-accent-deep: #db5f1d;
+  --farm-leaf: #5caf37;
+  --farm-text: #553819;
+  --farm-muted: #7f6445;
+  --farm-nav: rgba(255, 239, 185, 0.94);
+  --farm-nav-active: #fff8dd;
+  --farm-slot: #8f5b33;
+  --farm-slot-ready: #f0bb54;
+  --farm-slot-active: #72c94e;
+  --farm-slot-locked: #8e8a84;
+  --font-display: 'Trebuchet MS', 'Microsoft YaHei', sans-serif;
+}
