@@ -8,7 +8,7 @@ import { createNotificationBackfill } from './modules/notifications/notification
 import { createNotificationService } from './modules/notifications/notification-service';
 import { createTaskService } from './modules/tasks/task-service';
 
-export async function main(): Promise<void> {
+async function main(): Promise<void> {
   const env = loadEnv();
   const database = createDatabaseClient(env.databasePath);
 
