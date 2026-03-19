@@ -16,7 +16,7 @@ describe('App shell', () => {
     gameActions.reset();
   });
 
-  test('renders top stats bottom nav and connects socket after authentication', () => {
+  test('renders game shell structure and connects socket after authentication', () => {
     sessionActions.setSession({
       token: 'token-123',
       userId: 'user-1',
@@ -32,6 +32,10 @@ describe('App shell', () => {
       />,
     );
 
+    expect(html).toContain('farm-hud-top');
+    expect(html).toContain('farm-bottom-nav');
+    expect(html).toContain('farm-shell__overlay');
+    expect(html).toContain('farm-scene');
     expect(html).toContain('农场主');
     expect(html).toContain('金币');
     expect(html).toContain('经验');

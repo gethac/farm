@@ -23,17 +23,29 @@ export function FarmActionSheet(props: {
   }
 
   return (
-    <aside className="action-sheet" aria-label="地块操作">
-      <div className="action-sheet__header">
+    <aside className="farm-action-sheet" aria-label="地块操作">
+      <div className="farm-action-sheet__header">
         <strong>地块操作</strong>
         <button type="button" onClick={props.onClose}>关闭</button>
       </div>
-      <div className="action-sheet__actions">
+      <div className="farm-plot-bubble">
         {props.slot.availableActions.map((action) => (
           <button
             key={action}
             type="button"
-            className="action-sheet__button"
+            className="farm-plot-bubble__button"
+            onClick={() => props.onAction(action, props.slot!.slotId)}
+          >
+            {actionLabels[action]}
+          </button>
+        ))}
+      </div>
+      <div className="farm-action-sheet__actions">
+        {props.slot.availableActions.map((action) => (
+          <button
+            key={`${action}-sheet`}
+            type="button"
+            className="farm-action-sheet__button"
             onClick={() => props.onAction(action, props.slot!.slotId)}
           >
             {actionLabels[action]}

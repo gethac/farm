@@ -29,7 +29,7 @@ const slotUpdatedEvent: EventEnvelope<'farm:slotUpdated'> = {
 };
 
 describe('farm screen', () => {
-  test('renders slots action sheet and updates after farm realtime events', () => {
+  test('renders scene structure and updates harvest state after farm realtime events', () => {
     const initialState = createInitialGameState();
     const selectedState = {
       ...initialState,
@@ -55,10 +55,16 @@ describe('farm screen', () => {
       />,
     );
 
+    expect(initialHtml).toContain('farm-scene');
+    expect(initialHtml).toContain('farm-scene__background');
+    expect(initialHtml).toContain('farm-scene__plots');
+    expect(initialHtml).toContain('farm-scene__side-actions');
+    expect(initialHtml).toContain('farm-scene__friend-entry');
     expect(initialHtml).toContain('my-farm');
     expect(initialHtml).toContain('friend-a');
     expect(initialHtml).toContain('friend-b');
-    expect(initialHtml).toContain('action-sheet__button');
+    expect(initialHtml).toContain('farm-plot--selected');
+    expect(initialHtml).toContain('farm-action-sheet');
 
     const updatedState = reduceRealtimeEvent(selectedState, slotUpdatedEvent);
     const updatedSlot = updatedState.slots.find((slot) => slot.slotId === 'slot-2') as FarmSlotSummary;
@@ -79,7 +85,8 @@ describe('farm screen', () => {
       />,
     );
 
-    expect(updatedHtml).toContain('farm-slot-card--mature');
-    expect(updatedHtml).toContain('action-sheet__button');
+    expect(updatedHtml).toContain('farm-plot--mature');
+    expect(updatedHtml).toContain('收获');
+    expect(updatedHtml).toContain('farm-action-sheet');
   });
 });

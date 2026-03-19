@@ -20,9 +20,9 @@ export function FarmSlot(props: {
 }) {
   const cropLabel = props.slot.cropId ? cropLabels[props.slot.cropId] ?? props.slot.cropId : '未种植';
   const className = [
-    'farm-slot-card',
-    `farm-slot-card--${props.slot.locked ? 'locked' : props.slot.status}`,
-    props.isSelected ? 'farm-slot-card--selected' : '',
+    'farm-plot',
+    `farm-plot--${props.slot.locked ? 'locked' : props.slot.status}`,
+    props.isSelected ? 'farm-plot--selected' : '',
   ].filter(Boolean).join(' ');
 
   return (
@@ -32,6 +32,8 @@ export function FarmSlot(props: {
       className={className}
       onClick={() => props.onSelect(props.slot.slotId)}
     >
+      <span className="farm-plot__soil" aria-hidden="true" />
+      <span className="farm-plot__crop" aria-hidden="true" />
       <strong>{props.slot.locked ? '未解锁' : cropLabel}</strong>
       <span>{props.slot.locked ? '敬请期待' : statusLabels[props.slot.status]}</span>
       <em>健康 {props.slot.health}%</em>

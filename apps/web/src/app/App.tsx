@@ -191,11 +191,14 @@ export function AppShell(props: {
   onFarmAction?: (action: FarmOperateAction, slotId: string) => Promise<void> | void;
   onRefreshFarm?: () => Promise<void> | void;
 }) {
+  const mainPanel = renderMainPanel(props);
+  const isFarmTab = props.game.activeTab === 'farm';
+
   return (
-    <div className="app-shell">
+    <div className="app-shell farm-shell">
       <div className="app-bg app-bg--sky" />
       <div className="app-bg app-bg--glow" />
-      <main className="mobile-frame">
+      <main className={isFarmTab ? 'mobile-frame mobile-frame--farm' : 'mobile-frame mobile-frame--overlay'}>
         <FarmTopBar
           displayName={props.session.displayName ?? '游客'}
           level={props.game.level}
@@ -205,16 +208,31 @@ export function AppShell(props: {
           onOpenNotifications={() => gameActions.setNotificationsOpen(!props.game.notificationsOpen)}
         />
 
-        {props.game.notificationsOpen ? <NotificationsPanel notices={props.game.notices} /> : null}
+        <div className="farm-shell__main">
+          <div className="farm-shell__scene">{isFarmTab ? mainPanel : <FarmScreen
+            farm={props.game.farm}
+            slots={props.game.slots}
+            selectedSlotId={props.game.selectedSlotId}
+            friends={props.game.friends}
+            onSelectSlot={(slotId) => gameActions.selectSlot(slotId)}
+            onSelectFriend={(userId) => {
+              gameActions.selectFriend(userId);
+              void props.onVisitFriend?.(userId);
+            }}
+            onCloseActionSheet={() => gameActions.selectSlot(null)}
+            onAction={(action, slotId) => void props.onFarmAction?.(action, slotId)}
+            onRefresh={() => void props.onRefreshFarm?.()}
+          />}</div>
+          <div className="farm-shell__overlay">{isFarmTab ? null : mainPanel}</div>
+          {props.game.notificationsOpen ? <div className="farm-notifications-overlay"><NotificationsPanel notices={props.game.notices} /></div> : null}
+        </div>
 
-        {renderMainPanel(props)}
-
-        <nav className="bottom-nav" aria-label="主导航">
+        <nav className="farm-bottom-nav" aria-label="主导航">
           {props.routes.map((route) => (
             <button
               key={route.id}
               type="button"
-              className={route.id === props.game.activeTab ? 'nav-button nav-button--active' : 'nav-button'}
+              className={route.id === props.game.activeTab ? 'farm-bottom-nav__button farm-bottom-nav__button--active' : 'farm-bottom-nav__button'}
               onClick={() => props.onNavigate(route.id)}
             >
               <span>{route.icon}</span>

@@ -5,9 +5,9 @@ export function FarmFriendStrip(props: {
   onSelectFriend(userId: string): void;
 }) {
   return (
-    <div className="friend-strip" aria-label="好友农场切换">
+    <div className="farm-scene__friend-entry" aria-label="好友农场切换">
       {props.friends.map((friend) => (
-        <button key={friend.userId} type="button" className="friend-chip" onClick={() => props.onSelectFriend(friend.userId)}>
+        <button key={friend.userId} type="button" className="farm-scene__friend-chip" onClick={() => props.onSelectFriend(friend.userId)}>
           <strong>{friend.nickname}</strong>
           <span>{friend.canVisit ? '可访问' : '忙碌中'}</span>
         </button>
