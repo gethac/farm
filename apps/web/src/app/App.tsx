@@ -3,6 +3,7 @@ import { createAppRoutes, type AppRoute } from './router';
 import { useGameStore, gameActions, type GameState } from './store/game-store';
 import { useSessionStore, type SessionState } from './store/session-store';
 import { socketClient } from './socket/client';
+import { AuthGate } from '../features/auth/AuthGate';
 
 const routes = createAppRoutes();
 
@@ -30,6 +31,10 @@ export function App() {
       socketClient.disconnect();
     };
   }, [session.token]);
+
+  if (!session.token) {
+    return <AuthGate />;
+  }
 
   return (
     <AppShell
