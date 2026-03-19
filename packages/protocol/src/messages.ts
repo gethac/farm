@@ -1,4 +1,4 @@
-import type { EventMessageName } from './events';
+﻿import type { EventMessageName } from './events';
 
 export const requestNames = [
   'farm:getMine',
@@ -13,6 +13,23 @@ export const requestNames = [
 
 export type RequestMessageName = (typeof requestNames)[number];
 
+export type FarmOperateAction =
+  | 'plant'
+  | 'water'
+  | 'removeGrass'
+  | 'removeWorms'
+  | 'fertilize'
+  | 'harvest'
+  | 'clearDeadCrop'
+  | 'steal'
+  | 'help'
+  | 'throwWorms';
+
+export interface FarmDogSummary {
+  isActive: boolean;
+  protectionUntil: string | null;
+}
+
 export interface FarmSummary {
   farmId: string;
   ownerUserId: string;
@@ -21,6 +38,7 @@ export interface FarmSummary {
   coins: number;
   experience: number;
   protectionUntil?: string | null;
+  dog: FarmDogSummary;
 }
 
 export interface FarmSlotSummary {
@@ -28,9 +46,12 @@ export interface FarmSlotSummary {
   cropId: string | null;
   plantedAt: string | null;
   maturedAt: string | null;
+  withersAt: string | null;
   status: 'empty' | 'growing' | 'mature' | 'withered';
   stage: number;
   health: number;
+  locked: boolean;
+  availableActions: readonly FarmOperateAction[];
 }
 
 export interface InventoryEntrySummary {
@@ -65,18 +86,6 @@ export interface ShopItemSummary {
   price: number;
   category: 'seed' | 'tool' | 'consumable';
 }
-
-export type FarmOperateAction =
-  | 'plant'
-  | 'water'
-  | 'removeGrass'
-  | 'removeWorms'
-  | 'fertilize'
-  | 'harvest'
-  | 'clearDeadCrop'
-  | 'steal'
-  | 'help'
-  | 'throwWorms';
 
 export interface FarmOperateBaseRequest {
   farmId: string;

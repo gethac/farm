@@ -3,12 +3,15 @@ import type { DatabaseClient } from './db/client';
 import type { ServerEnv } from './env';
 import { createAuthService } from './modules/auth/auth-service';
 import { registerAuthController } from './modules/auth/auth-controller';
+import { createFarmQueryService } from './modules/farm/farm-query-service';
+import { createRealtimeRouter, type RealtimeRouter } from './realtime/router';
 import { createSessionStore, type SessionStore } from './realtime/session-store';
 import { registerSocketServer } from './realtime/socket-server';
 
 export interface AppContext {
   database: DatabaseClient;
   env: ServerEnv;
+  now?: () => Date;
 }
 
 export interface ServerApp {
@@ -22,6 +25,7 @@ export interface ServerApp {
     address(): { port: number } | string | null;
   };
   sessionStore: SessionStore;
+  realtimeRouter: RealtimeRouter;
 }
 
 export async function buildApp(context: AppContext): Promise<ServerApp> {
@@ -29,7 +33,11 @@ export async function buildApp(context: AppContext): Promise<ServerApp> {
 
   const authService = createAuthService(context.database, context.env.authSecret);
   const sessionStore = createSessionStore();
+  const farmQueryService = createFarmQueryService(context.database, context.now ?? (() => new Date()));
+  const realtimeRouter = createRealtimeRouter({ farmQueryService });
+
   app.sessionStore = sessionStore;
+  app.realtimeRouter = realtimeRouter;
 
   registerAuthController(app, authService);
   registerSocketServer(app, authService, sessionStore);
