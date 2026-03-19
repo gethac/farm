@@ -7,10 +7,12 @@ import { createFarmOperationService } from './modules/farm/farm-operation-servic
 import { createFarmQueryService } from './modules/farm/farm-query-service';
 import { createInventoryService } from './modules/inventory/inventory-service';
 import { createNotificationService } from './modules/notifications/notification-service';
+import { createRankingService } from './modules/ranking/ranking-service';
 import { createShopService } from './modules/shop/shop-service';
 import { createActivityLogRepository } from './modules/social/activity-log-repository';
 import { createFriendshipRepository } from './modules/social/friendship-repository';
 import { createSocialService } from './modules/social/social-service';
+import { createTaskService } from './modules/tasks/task-service';
 import { createRealtimeRouter, type RealtimeRouter } from './realtime/router';
 import { createSessionStore, type SessionStore } from './realtime/session-store';
 import { registerSocketServer } from './realtime/socket-server';
@@ -41,11 +43,13 @@ export async function buildApp(context: AppContext): Promise<ServerApp> {
 
   const authService = createAuthService(context.database, context.env.authSecret);
   const sessionStore = createSessionStore();
+  const notificationService = createNotificationService(context.database);
+  const taskService = createTaskService(context.database, now, notificationService);
+  const rankingService = createRankingService(context.database);
   const farmQueryService = createFarmQueryService(context.database, now);
   const farmOperationService = createFarmOperationService(context.database, now);
   const inventoryService = createInventoryService(context.database, now);
   const shopService = createShopService(context.database, now);
-  const notificationService = createNotificationService(context.database);
   const friendshipRepository = createFriendshipRepository(context.database);
   const activityLogRepository = createActivityLogRepository(context.database);
   const socialService = createSocialService({
@@ -59,8 +63,10 @@ export async function buildApp(context: AppContext): Promise<ServerApp> {
     farmOperationService,
     inventoryService,
     notificationService,
+    rankingService,
     shopService,
     socialService,
+    taskService,
   });
 
   app.sessionStore = sessionStore;

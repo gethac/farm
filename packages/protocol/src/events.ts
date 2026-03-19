@@ -11,6 +11,7 @@ import type {
   NotificationSummary,
   ShopItemSummary,
   SocialVisitSummary,
+  TaskMutationSummary,
   TaskSummary,
 } from './messages';
 
@@ -29,6 +30,7 @@ export const eventNames = [
   'social:visit',
   'notice:list',
   'tasks:list',
+  'tasks:claim',
   'ranking:list',
   'farm:slotUpdated',
   'farm:cropMatured',
@@ -59,6 +61,7 @@ export interface EventPayloadMap {
   'social:visit': SocialVisitSummary;
   'notice:list': { notices: readonly NotificationSummary[] };
   'tasks:list': { tasks: readonly TaskSummary[] };
+  'tasks:claim': TaskMutationSummary;
   'ranking:list': { entries: readonly LeaderboardEntrySummary[] };
   'farm:slotUpdated': { farmId: string; slot: FarmSlotSummary };
   'farm:cropMatured': { farmId: string; slotId: string; cropId: string };
@@ -91,6 +94,7 @@ export const events = {
   'social:visit': { name: 'social:visit', kind: 'event' },
   'notice:list': { name: 'notice:list', kind: 'event' },
   'tasks:list': { name: 'tasks:list', kind: 'event' },
+  'tasks:claim': { name: 'tasks:claim', kind: 'event' },
   'ranking:list': { name: 'ranking:list', kind: 'event' },
   'farm:slotUpdated': { name: 'farm:slotUpdated', kind: 'event' },
   'farm:cropMatured': { name: 'farm:cropMatured', kind: 'event' },

@@ -5,6 +5,7 @@ import type { DatabaseClient } from '../../db/client';
 import { runInTransaction } from '../../lib/transactions';
 import { createFarmRepository, type CropInstanceRow } from './farm-repository';
 import { buildAffectedEventNames } from './farm-events';
+import { createTaskProgressor } from '../tasks/task-progressor';
 
 interface FarmRow {
   id: string;
@@ -54,6 +55,7 @@ export function createFarmOperationService(
   now: () => Date = () => new Date(),
 ): FarmOperationService {
   const repository = createFarmRepository(database);
+  const taskProgressor = createTaskProgressor(database, now);
 
   return {
     execute(userId, request) {
@@ -138,7 +140,7 @@ export function createFarmOperationService(
       WHERE id = @slotId
     `).run({ cropInstanceId, slotId: request.slotId });
 
-    advanceTaskProgress(userId, 'new-player-plant-first-crop', 1);
+    taskProgressor.recordEvent(userId, 'plant', 1);
 
     return {
       farmOwnerUserId: farm.user_id,
@@ -162,6 +164,9 @@ export function createFarmOperationService(
     requireSlotStatus(slot, cropRow, 'growing');
 
     updateCropMeta(cropRow, updateMeta);
+    if (request.action === 'water') {
+      taskProgressor.recordEvent(userId, 'water', 1);
+    }
 
     return {
       farmOwnerUserId: farm.user_id,
@@ -659,3 +664,4 @@ function resolveSlotLevels(cropRow: CropInstanceRow): { waterLevel: number; gras
 function readNumber(value: unknown, fallback: number): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
 }
+

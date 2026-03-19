@@ -10,13 +10,16 @@ import type {
   ResponseEnvelope,
   ShopPurchaseRequest,
   SocialVisitRequest,
+  TaskClaimRequest,
 } from '@qq-classic-farm/protocol';
 import type { FarmOperationService } from '../modules/farm/farm-operation-service';
 import type { FarmQueryService } from '../modules/farm/farm-query-service';
 import type { InventoryService } from '../modules/inventory/inventory-service';
 import type { NotificationService } from '../modules/notifications/notification-service';
+import type { RankingService } from '../modules/ranking/ranking-service';
 import type { ShopService } from '../modules/shop/shop-service';
 import type { SocialService } from '../modules/social/social-service';
+import type { TaskService } from '../modules/tasks/task-service';
 import type { SocketSession } from './session-store';
 
 export interface RealtimeRouter {
@@ -28,8 +31,10 @@ export function createRealtimeRouter(dependencies: {
   farmOperationService: FarmOperationService;
   inventoryService: InventoryService;
   notificationService: NotificationService;
+  rankingService: RankingService;
   shopService: ShopService;
   socialService: SocialService;
+  taskService: TaskService;
 }): RealtimeRouter {
   return {
     handle(session, request) {
@@ -148,6 +153,35 @@ export function createRealtimeRouter(dependencies: {
               message: 'notice:list',
               payload: {
                 notices: dependencies.notificationService.list(session.userId),
+              },
+            };
+          }
+          case 'tasks:list': {
+            return {
+              requestId: request.requestId,
+              message: 'tasks:list',
+              payload: {
+                tasks: dependencies.taskService.list(session.userId),
+              },
+            };
+          }
+          case 'tasks:claim': {
+            const payload = request.payload as TaskClaimRequest;
+            return {
+              requestId: request.requestId,
+              message: 'tasks:claim',
+              payload: dependencies.taskService.claimReward(session.userId, payload.taskId),
+            };
+          }
+          case 'ranking:list': {
+            const payload = request.payload as { rankingId?: string };
+            const rankingId = payload.rankingId ?? 'coins-all-time';
+            dependencies.rankingService.refresh(rankingId);
+            return {
+              requestId: request.requestId,
+              message: 'ranking:list',
+              payload: {
+                entries: dependencies.rankingService.list(rankingId),
               },
             };
           }

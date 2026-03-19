@@ -15,6 +15,7 @@ export const requestNames = [
   'social:visit',
   'notice:list',
   'tasks:list',
+  'tasks:claim',
   'ranking:list',
 ] as const;
 
@@ -116,6 +117,12 @@ export interface ShopItemSummary {
 export interface InventoryMutationSummary {
   farm: FarmSummary;
   inventory: readonly InventoryEntrySummary[];
+  affectedEventNames: readonly EventMessageName[];
+}
+
+export interface TaskMutationSummary {
+  farm: FarmSummary;
+  tasks: readonly TaskSummary[];
   affectedEventNames: readonly EventMessageName[];
 }
 
@@ -233,6 +240,10 @@ export interface SocialVisitRequest {
   targetUserId: string;
 }
 
+export interface TaskClaimRequest {
+  taskId: string;
+}
+
 export interface RequestPayloadMap {
   'farm:getMine': Record<string, never>;
   'farm:getUser': { userId: string };
@@ -248,6 +259,7 @@ export interface RequestPayloadMap {
   'social:visit': SocialVisitRequest;
   'notice:list': Record<string, never>;
   'tasks:list': Record<string, never>;
+  'tasks:claim': TaskClaimRequest;
   'ranking:list': { rankingId?: string };
 }
 
@@ -279,6 +291,7 @@ export interface ResponsePayloadMap {
   'social:visit': SocialVisitSummary;
   'notice:list': { notices: readonly NotificationSummary[] };
   'tasks:list': { tasks: readonly TaskSummary[] };
+  'tasks:claim': TaskMutationSummary;
   'ranking:list': { entries: readonly LeaderboardEntrySummary[] };
 }
 
@@ -314,5 +327,6 @@ export const requests = {
   'social:visit': { name: 'social:visit', kind: 'request' },
   'notice:list': { name: 'notice:list', kind: 'request' },
   'tasks:list': { name: 'tasks:list', kind: 'request' },
+  'tasks:claim': { name: 'tasks:claim', kind: 'request' },
   'ranking:list': { name: 'ranking:list', kind: 'request' },
 } as const satisfies Record<RequestMessageName, RequestDefinition>;
