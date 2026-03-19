@@ -8,8 +8,8 @@ test('registers logs in and lands on the farm home screen', async ({ page }) => 
   await page.getByLabel('密码').fill('pw123456');
   await page.getByRole('button', { name: '注册' }).click();
 
-  await expect(page.getByText('我的农场')).toBeVisible();
+  await expect(page.getByRole('button', { name: '地块 1' })).toBeVisible();
 
   await page.reload();
-  await expect(page.getByText('我的农场')).toBeVisible();
+  await expect(page.getByRole('button', { name: '地块 1' })).toBeVisible();
 });

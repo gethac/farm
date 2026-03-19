@@ -17,7 +17,7 @@ test('adds a friend visits the friend farm helps and steals', async ({ browser, 
   await page.getByRole('button', { name: '登录' }).click();
 
   await page.getByRole('button', { name: '好友' }).click();
-  await expect(page.getByText(userB)).toBeVisible();
+  await expect(page.getByRole('button', { name: `访问 ${userB}` })).toBeVisible();
   await page.getByRole('button', { name: `访问 ${userB}` }).click();
 
   await page.getByRole('button', { name: '地块 1' }).click();

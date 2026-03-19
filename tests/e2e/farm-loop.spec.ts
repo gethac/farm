@@ -8,7 +8,7 @@ test('buys seeds plants matures harvests claims task reward and opens leaderboar
   await page.getByLabel('昵称').fill(displayName);
   await page.getByLabel('密码').fill('pw123456');
   await page.getByRole('button', { name: '注册' }).click();
-  await expect(page.getByText('我的农场')).toBeVisible();
+  await expect(page.getByRole('button', { name: '地块 1' })).toBeVisible();
 
   await page.getByRole('button', { name: '商店' }).click();
   await page.getByRole('button', { name: '购买 玉米种子' }).click();

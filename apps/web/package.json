@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "@qq-classic-farm/web",
   "private": true,
   "version": "0.0.0",
@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node ../../node_modules/vite/bin/vite.js --configLoader native --config vite.config.ts",
     "test": "vitest run",
-    "build": "tsc -p tsconfig.json && node scripts.build.mjs"
+    "build": "node ../../scripts/windows-ascii-runner.mjs --cwd apps/web -- \"tsc -p tsconfig.json && node scripts.build.mjs\""
   },
   "dependencies": {
     "@qq-classic-farm/protocol": "file:../../packages/protocol",

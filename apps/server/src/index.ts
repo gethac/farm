@@ -8,7 +8,7 @@ import { createNotificationBackfill } from './modules/notifications/notification
 import { createNotificationService } from './modules/notifications/notification-service';
 import { createTaskService } from './modules/tasks/task-service';
 
-async function main(): Promise<void> {
+export async function main(): Promise<void> {
   const env = loadEnv();
   const database = createDatabaseClient(env.databasePath);
 
@@ -45,11 +45,7 @@ async function main(): Promise<void> {
   }
 }
 
-const isMainModule = import.meta.url === new URL(process.argv[1] ?? '', 'file:').href;
-
-if (isMainModule) {
-  main().catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
-  });
-}
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

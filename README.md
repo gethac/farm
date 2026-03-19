@@ -49,7 +49,7 @@ npm run dev:web
 运行单元测试：
 
 ```bash
-npm test -- --pool threads
+npm test
 ```
 
 运行 Playwright e2e：
@@ -77,6 +77,8 @@ npm run build
 npm run build -w @qq-classic-farm/server
 npm run build -w @qq-classic-farm/web
 ```
+
+在 Windows 下，`build` 和 `test:e2e` 会自动切到 ASCII 映射盘符运行，以规避某些工具链在中文路径上的进程启动问题。
 
 ## 数据与实时同步
 
