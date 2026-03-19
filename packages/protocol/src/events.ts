@@ -2,6 +2,7 @@ import type {
   FarmSlotSummary,
   FriendSummary,
   InventoryEntrySummary,
+  InventoryMutationSummary,
   LeaderboardEntrySummary,
   ShopItemSummary,
   TaskSummary,
@@ -12,7 +13,9 @@ export const eventNames = [
   'farm:getUser',
   'farm:operate',
   'shop:list',
+  'shop:purchase',
   'inventory:list',
+  'inventory:sell',
   'friends:list',
   'tasks:list',
   'ranking:list',
@@ -31,7 +34,9 @@ export interface EventPayloadMap {
   'farm:getUser': { slots: readonly FarmSlotSummary[] };
   'farm:operate': { slots: readonly FarmSlotSummary[] };
   'shop:list': { items: readonly ShopItemSummary[] };
+  'shop:purchase': InventoryMutationSummary;
   'inventory:list': { items: readonly InventoryEntrySummary[] };
+  'inventory:sell': InventoryMutationSummary;
   'friends:list': { friends: readonly FriendSummary[] };
   'tasks:list': { tasks: readonly TaskSummary[] };
   'ranking:list': { entries: readonly LeaderboardEntrySummary[] };
@@ -56,7 +61,9 @@ export const events = {
   'farm:getUser': { name: 'farm:getUser', kind: 'event' },
   'farm:operate': { name: 'farm:operate', kind: 'event' },
   'shop:list': { name: 'shop:list', kind: 'event' },
+  'shop:purchase': { name: 'shop:purchase', kind: 'event' },
   'inventory:list': { name: 'inventory:list', kind: 'event' },
+  'inventory:sell': { name: 'inventory:sell', kind: 'event' },
   'friends:list': { name: 'friends:list', kind: 'event' },
   'tasks:list': { name: 'tasks:list', kind: 'event' },
   'ranking:list': { name: 'ranking:list', kind: 'event' },

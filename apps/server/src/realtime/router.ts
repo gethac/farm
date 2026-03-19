@@ -1,12 +1,16 @@
 import type {
   ErrorEnvelope,
   FarmOperateRequest,
+  InventorySellRequest,
   ProtocolErrorCode,
   RequestEnvelope,
   ResponseEnvelope,
+  ShopPurchaseRequest,
 } from '@qq-classic-farm/protocol';
 import type { FarmOperationService } from '../modules/farm/farm-operation-service';
 import type { FarmQueryService } from '../modules/farm/farm-query-service';
+import type { InventoryService } from '../modules/inventory/inventory-service';
+import type { ShopService } from '../modules/shop/shop-service';
 import type { SocketSession } from './session-store';
 
 export interface RealtimeRouter {
@@ -16,6 +20,8 @@ export interface RealtimeRouter {
 export function createRealtimeRouter(dependencies: {
   farmQueryService: FarmQueryService;
   farmOperationService: FarmOperationService;
+  inventoryService: InventoryService;
+  shopService: ShopService;
 }): RealtimeRouter {
   return {
     handle(session, request) {
@@ -53,6 +59,40 @@ export function createRealtimeRouter(dependencies: {
                 slots: snapshot.slots,
                 affectedEventNames: operation.affectedEventNames,
               },
+            };
+          }
+          case 'shop:list': {
+            return {
+              requestId: request.requestId,
+              message: 'shop:list',
+              payload: {
+                items: dependencies.shopService.list(),
+              },
+            };
+          }
+          case 'shop:purchase': {
+            const payload = request.payload as ShopPurchaseRequest;
+            return {
+              requestId: request.requestId,
+              message: 'shop:purchase',
+              payload: dependencies.shopService.purchase(session.userId, payload),
+            };
+          }
+          case 'inventory:list': {
+            return {
+              requestId: request.requestId,
+              message: 'inventory:list',
+              payload: {
+                items: dependencies.inventoryService.list(session.userId),
+              },
+            };
+          }
+          case 'inventory:sell': {
+            const payload = request.payload as InventorySellRequest;
+            return {
+              requestId: request.requestId,
+              message: 'inventory:sell',
+              payload: dependencies.inventoryService.sell(session.userId, payload),
             };
           }
           default:

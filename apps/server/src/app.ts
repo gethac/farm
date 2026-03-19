@@ -5,6 +5,8 @@ import { createAuthService } from './modules/auth/auth-service';
 import { registerAuthController } from './modules/auth/auth-controller';
 import { createFarmOperationService } from './modules/farm/farm-operation-service';
 import { createFarmQueryService } from './modules/farm/farm-query-service';
+import { createInventoryService } from './modules/inventory/inventory-service';
+import { createShopService } from './modules/shop/shop-service';
 import { createRealtimeRouter, type RealtimeRouter } from './realtime/router';
 import { createSessionStore, type SessionStore } from './realtime/session-store';
 import { registerSocketServer } from './realtime/socket-server';
@@ -37,7 +39,9 @@ export async function buildApp(context: AppContext): Promise<ServerApp> {
   const sessionStore = createSessionStore();
   const farmQueryService = createFarmQueryService(context.database, now);
   const farmOperationService = createFarmOperationService(context.database, now);
-  const realtimeRouter = createRealtimeRouter({ farmQueryService, farmOperationService });
+  const inventoryService = createInventoryService(context.database, now);
+  const shopService = createShopService(context.database, now);
+  const realtimeRouter = createRealtimeRouter({ farmQueryService, farmOperationService, inventoryService, shopService });
 
   app.sessionStore = sessionStore;
   app.realtimeRouter = realtimeRouter;

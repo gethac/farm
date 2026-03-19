@@ -1,11 +1,13 @@
-﻿import type { EventMessageName } from './events';
+import type { EventMessageName } from './events';
 
 export const requestNames = [
   'farm:getMine',
   'farm:getUser',
   'farm:operate',
   'shop:list',
+  'shop:purchase',
   'inventory:list',
+  'inventory:sell',
   'friends:list',
   'tasks:list',
   'ranking:list',
@@ -87,6 +89,12 @@ export interface ShopItemSummary {
   category: 'seed' | 'tool' | 'consumable';
 }
 
+export interface InventoryMutationSummary {
+  farm: FarmSummary;
+  inventory: readonly InventoryEntrySummary[];
+  affectedEventNames: readonly EventMessageName[];
+}
+
 export interface FarmOperateBaseRequest {
   farmId: string;
   slotId: string;
@@ -153,12 +161,24 @@ export type FarmOperateRequest =
   | HelpOperateRequest
   | ThrowWormsOperateRequest;
 
+export interface ShopPurchaseRequest {
+  itemId: string;
+  quantity: number;
+}
+
+export interface InventorySellRequest {
+  itemId: string;
+  quantity: number;
+}
+
 export interface RequestPayloadMap {
   'farm:getMine': Record<string, never>;
   'farm:getUser': { userId: string };
   'farm:operate': FarmOperateRequest;
   'shop:list': Record<string, never>;
+  'shop:purchase': ShopPurchaseRequest;
   'inventory:list': Record<string, never>;
+  'inventory:sell': InventorySellRequest;
   'friends:list': Record<string, never>;
   'tasks:list': Record<string, never>;
   'ranking:list': { rankingId?: string };
@@ -178,7 +198,9 @@ export interface ResponsePayloadMap {
     affectedEventNames: readonly EventMessageName[];
   };
   'shop:list': { items: readonly ShopItemSummary[] };
+  'shop:purchase': InventoryMutationSummary;
   'inventory:list': { items: readonly InventoryEntrySummary[] };
+  'inventory:sell': InventoryMutationSummary;
   'friends:list': { friends: readonly FriendSummary[] };
   'tasks:list': { tasks: readonly TaskSummary[] };
   'ranking:list': { entries: readonly LeaderboardEntrySummary[] };
@@ -206,7 +228,9 @@ export const requests = {
   'farm:getUser': { name: 'farm:getUser', kind: 'request' },
   'farm:operate': { name: 'farm:operate', kind: 'request' },
   'shop:list': { name: 'shop:list', kind: 'request' },
+  'shop:purchase': { name: 'shop:purchase', kind: 'request' },
   'inventory:list': { name: 'inventory:list', kind: 'request' },
+  'inventory:sell': { name: 'inventory:sell', kind: 'request' },
   'friends:list': { name: 'friends:list', kind: 'request' },
   'tasks:list': { name: 'tasks:list', kind: 'request' },
   'ranking:list': { name: 'ranking:list', kind: 'request' },
