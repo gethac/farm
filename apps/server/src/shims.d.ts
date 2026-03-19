@@ -16,7 +16,7 @@ declare module 'node:fs' {
   export function mkdirSync(path: string, options?: { recursive?: boolean }): void;
   export function mkdtempSync(prefix: string): string;
   export function readFileSync(path: string | URL, encoding: string): string;
-  export function rmSync(path: string, options?: { force?: boolean }): void;
+  export function rmSync(path: string, options?: { force?: boolean; recursive?: boolean }): void;
 }
 
 declare module 'node:os' {
@@ -68,3 +68,4 @@ declare module 'node:net' {
 
   export function createConnection(options: { host: string; port: number }): Socket;
 }
+

@@ -40,12 +40,13 @@ describe('database migrations', () => {
     const dbDir = mkdtempSync(join(tmpdir(), 'farm-server-'));
     dbFile = join(dbDir, 'test.sqlite');
 
-    database = createDatabaseClient(dbFile);
+    const db = createDatabaseClient(dbFile);
+    database = db;
 
-    migrate(database);
-    seed(database);
+    migrate(db);
+    seed(db);
 
-    const rows = database.prepare(`
+    const rows = db.prepare(`
       SELECT name
       FROM sqlite_master
       WHERE type = 'table' AND name NOT LIKE 'sqlite_%'
@@ -60,8 +61,10 @@ describe('database migrations', () => {
     const dbDir = mkdtempSync(join(tmpdir(), 'farm-server-'));
     dbFile = join(dbDir, 'test.sqlite');
 
-    database = createDatabaseClient(dbFile);
-    database.exec(`
+    const db = createDatabaseClient(dbFile);
+    database = db;
+
+    db.exec(`
       PRAGMA foreign_keys = ON;
       CREATE TABLE users (
         id TEXT PRIMARY KEY,
@@ -75,10 +78,10 @@ describe('database migrations', () => {
         ('user-1', 'Ada', 'hash-1');
     `);
 
-    migrate(database);
+    migrate(db);
 
     expect(() =>
-      database.prepare(
+      db.prepare(
         `INSERT INTO users (id, display_name, password_hash) VALUES ('user-2', 'Ada', 'hash-2')`,
       ).run(),
     ).toThrow();
@@ -88,8 +91,10 @@ describe('database migrations', () => {
     const dbDir = mkdtempSync(join(tmpdir(), 'farm-server-'));
     dbFile = join(dbDir, 'test.sqlite');
 
-    database = createDatabaseClient(dbFile);
-    database.exec(`
+    const db = createDatabaseClient(dbFile);
+    database = db;
+
+    db.exec(`
       PRAGMA foreign_keys = ON;
       CREATE TABLE users (
         id TEXT PRIMARY KEY,
@@ -104,7 +109,7 @@ describe('database migrations', () => {
         ('user-2', 'Ada', 'hash-2');
     `);
 
-    expect(() => migrate(database)).toThrowError(
+    expect(() => migrate(db)).toThrowError(
       'Cannot migrate users.display_name uniqueness: legacy database contains duplicate display_name "Ada" (2 rows).',
     );
   });

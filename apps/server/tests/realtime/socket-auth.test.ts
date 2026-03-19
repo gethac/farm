@@ -33,7 +33,7 @@ function performUpgrade(port: number, path: string): Promise<{ headers: string }
     });
 
     socket.on('data', (chunk) => {
-      buffer += chunk.toString('binary');
+      buffer += String(chunk);
       const headerEnd = buffer.indexOf('\r\n\r\n');
       if (headerEnd === -1) {
         return;
