@@ -504,3 +504,53 @@ input {
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
 }
+
+.notice-button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 2px solid rgba(98, 60, 26, 0.28);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fff8dd 0%, #ffd37d 100%);
+  color: var(--farm-text);
+}
+
+.notice-button em {
+  position: absolute;
+  top: -6px;
+  right: -4px;
+  min-width: 20px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #db5f1d;
+  color: #fff;
+  font-size: 11px;
+  font-style: normal;
+}
+
+.content-panel--notice {
+  margin-top: -4px;
+}
+
+.list-panel {
+  display: grid;
+  gap: 10px;
+}
+
+.list-card {
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+  border: 2px solid rgba(98, 60, 26, 0.2);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.list-card span,
+.list-card em {
+  color: var(--farm-muted);
+  font-size: 12px;
+  font-style: normal;
+}

@@ -7,6 +7,12 @@ import { handleSocketEvent } from './socket/handlers';
 import { AuthGate } from '../features/auth/AuthGate';
 import { FarmTopBar } from '../features/farm/FarmTopBar';
 import { FarmScreen } from '../features/farm/FarmScreen';
+import { ShopSheet } from '../features/shop/ShopSheet';
+import { InventorySheet } from '../features/inventory/InventorySheet';
+import { FriendsDrawer } from '../features/social/FriendsDrawer';
+import { TasksSheet } from '../features/tasks/TasksSheet';
+import { RankingSheet } from '../features/ranking/RankingSheet';
+import { NotificationsPanel } from '../features/notifications/NotificationsPanel';
 
 const routes = createAppRoutes();
 
@@ -57,8 +63,6 @@ export function AppShell(props: {
   routes: readonly AppRoute[];
   onNavigate(tabId: AppRoute['id']): void;
 }) {
-  const currentRoute = props.routes.find((route) => route.id === props.game.activeTab) ?? props.routes[0];
-
   return (
     <div className="app-shell">
       <div className="app-bg app-bg--sky" />
@@ -69,27 +73,13 @@ export function AppShell(props: {
           level={props.game.level}
           coins={props.game.coins}
           experience={props.game.experience}
+          notificationCount={props.game.notices.filter((notice) => !notice.isRead).length}
+          onOpenNotifications={() => gameActions.setNotificationsOpen(!props.game.notificationsOpen)}
         />
 
-        {props.game.activeTab === 'farm' ? (
-          <FarmScreen
-            farm={props.game.farm}
-            slots={props.game.slots}
-            selectedSlotId={props.game.selectedSlotId}
-            friends={props.game.friends}
-            onSelectSlot={(slotId) => gameActions.selectSlot(slotId)}
-            onSelectFriend={(userId) => gameActions.selectFriend(userId)}
-            onCloseActionSheet={() => gameActions.selectSlot(null)}
-          />
-        ) : (
-          <section className="content-panel" aria-label={currentRoute.label}>
-            <div className="content-header">
-              <strong>{currentRoute.label}</strong>
-              <span>{currentRoute.description}</span>
-            </div>
-            <div className="panel-placeholder">{currentRoute.label} 面板即将接入实时数据。</div>
-          </section>
-        )}
+        {props.game.notificationsOpen ? <NotificationsPanel notices={props.game.notices} /> : null}
+
+        {renderMainPanel(props)}
 
         <nav className="bottom-nav" aria-label="主导航">
           {props.routes.map((route) => (
@@ -107,4 +97,35 @@ export function AppShell(props: {
       </main>
     </div>
   );
+}
+
+function renderMainPanel(props: {
+  game: GameState;
+}) {
+  switch (props.game.activeTab) {
+    case 'farm':
+      return (
+        <FarmScreen
+          farm={props.game.farm}
+          slots={props.game.slots}
+          selectedSlotId={props.game.selectedSlotId}
+          friends={props.game.friends}
+          onSelectSlot={(slotId) => gameActions.selectSlot(slotId)}
+          onSelectFriend={(userId) => gameActions.selectFriend(userId)}
+          onCloseActionSheet={() => gameActions.selectSlot(null)}
+        />
+      );
+    case 'shop':
+      return <ShopSheet items={props.game.shopItems} />;
+    case 'inventory':
+      return <InventorySheet items={props.game.inventoryItems} />;
+    case 'friends':
+      return <FriendsDrawer friends={props.game.friends} />;
+    case 'tasks':
+      return <TasksSheet tasks={props.game.tasks} />;
+    case 'ranking':
+      return <RankingSheet entries={props.game.rankingEntries} />;
+    default:
+      return null;
+  }
 }

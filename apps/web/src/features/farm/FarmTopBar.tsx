@@ -3,6 +3,8 @@
   level: number;
   coins: number;
   experience: number;
+  notificationCount: number;
+  onOpenNotifications(): void;
 }) {
   return (
     <header className="top-bar">
@@ -21,6 +23,10 @@
         <span>经验</span>
         <strong>{props.experience}</strong>
       </div>
+      <button type="button" className="notice-button" onClick={props.onOpenNotifications}>
+        铃
+        <em>{props.notificationCount}</em>
+      </button>
     </header>
   );
 }
